@@ -20,6 +20,21 @@ services:
     networks:
       - rampsearch
 
+  v-ramp:
+    container_name: v-ramp
+    build:
+      context: ./v-front
+      dockerfile: Dockerfile
+    volumes:
+      - './v-front:/app'
+      - '/app/node_modules'
+    ports:
+      - 3000:3000
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - rampsearch
+
 volumes:
   data01:
     driver: local
