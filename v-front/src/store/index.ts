@@ -1,32 +1,38 @@
-import { createStore, combineReducers, Reducer, applyMiddleware } from "redux";
+import { createStore, applyMiddleware } from "redux";
+import { createSelectorHook } from 'react-redux'
 import thunkMiddleware from 'redux-thunk';
-import {VRampState, VRampBaseAction} from './types';
-import { composeWithDevTools } from 'redux-devtools-extension'
+import {VRampState, VRampBaseAction, VRampGeoDataAction} from './types';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import { ACTION_TYPES } from './actions/types';
 
 
 const initialState : VRampState = {
+
     filterMaterial: undefined,
     filterSize: undefined,
-    bounds: undefined
+    bounds: undefined,
+    ramps: undefined,
+    isLoadingRamps: true,
+    isFilteringGraphs: true
+
 }
 
 function baseReducer(state : VRampState = initialState, action : VRampBaseAction) : VRampState {
 
-    switch(action)
+    switch(action.type)
     {
-        default:
-            return state;
+        case ACTION_TYPES.GEODATA_LOADED:
+            console.log('GEODATA LOADED');
+            const ca = action as VRampGeoDataAction;
+            return {...state, ramps: ca.payload, isLoadingRamps: false}         
     }
 
+    return state;
 }
 
-const composedEnhancer = composeWithDevTools(applyMiddleware(thunkMiddleware));
-const rootReducer: Reducer<VRampState> = combineReducers<VRampState, VRampBaseAction>({
-    main: baseReducer
-} as any);
+export const useSelector = createSelectorHook<VRampState>();
 
 
-
-
-const store = createStore(rootReducer, initialState)
+//const composedEnhancer = composeWithDevTools(applyMiddleware(thunkMiddleware))
+const store = createStore(baseReducer, initialState /*, composedEnhancer */)
 export default store

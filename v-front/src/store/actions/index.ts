@@ -1,3 +1,3 @@
 
 export * from './types';
-export { default as loadAllRamps } from './loadAllRamps';
+export { default as geodataLoaded } from './geodataLoaded';

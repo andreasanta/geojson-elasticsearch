@@ -1,31 +1,19 @@
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-
+import React from 'react';
 import './App.css';
 
 
 // Components
 import Map from './components/Map';
+import ErrorBoundary from './components/ErrorBoundary';
 
-// Main store and actions
-import { loadAllRamps } from './store/actions';
 
 function App() {
 
-  console.log(loadAllRamps);
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-      //@ts-ignore
-      dispatch(loadAllRamps());
-
-    
-  },[]); // eslint-disable-line react-hooks/exhaustive-deps
-
   return (
       <div className="app">
-        <Map></Map>
+        <ErrorBoundary>
+            <Map></Map>
+        </ErrorBoundary>
       </div>
   );
 }
