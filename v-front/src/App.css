@@ -3,6 +3,8 @@
   height: 100vh;
   scroll-behavior: none;
   overflow: hidden;
+  background-color: #383838;
+  color: #fff;
 }
 
 #v-map {
@@ -14,14 +16,36 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width:100vw;
-  height:100vh;
+  width:100%;
+  height:100%;
 }
 
 .errorBoundary {
   display: flex;
   justify-content: center;
   align-items: center;
-  width:100vw;
-  height:100vh;
+  width:100%;
+  height:100%;
+}
+
+.charts {
+  position: absolute;
+  right: 20px;
+  width: 350px;
+  padding: 20px 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+.chartContainer
+{
+  text-align:center;
+  border: 1px solid darkgrey;
+  background: slategray;
+  box-shadow: 2px 2px 4px 4px black;
+  z-index: 1001;
 }

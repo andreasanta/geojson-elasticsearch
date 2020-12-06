@@ -64,8 +64,14 @@
                     }
                 }
             },
+            "area_": {
+                "type": "float"
+            },
+            "material": {
+                "type": "keyword"
+            },
             "Shape_Area": {
-                "type": "long"
+                "type": "keyword"
             },
             "Shape_Leng": {
                 "type": "float"
