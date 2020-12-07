@@ -2,6 +2,12 @@
 
 As instructed, this project loads a list of boat ramps, displays it on a map and allows filtering.
 
+## Sneak Peek
+
+Please find below a video of the product in action:
+
+<iframe src="https://player.vimeo.com/video/487912939" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+
 ## Preliminary notes
 
 In order to optimize search queries, a dockerized image of ElasticSearch has been used and
