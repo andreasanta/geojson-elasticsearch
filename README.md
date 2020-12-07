@@ -13,7 +13,7 @@ https://vimeo.com/487912939
 In order to optimize search queries, a dockerized image of ElasticSearch has been used and
 GeoJSON data has been parsed and injected into a custom index. The script
 
-`scripts/geojson_es_import.py``
+`scripts/geojson_es_import.py`
 
 Executes the import when ElasticSearch is running.
 
