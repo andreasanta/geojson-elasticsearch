@@ -4,7 +4,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 import tqdm
 
-INDEX_NAME='geotest'
+INDEX_NAME='ramps'
 
 # Import the GeoJSON data into Pandas, so we can pre-process it a bit
 with open('./data/boat_ramps.geojson') as f: 
