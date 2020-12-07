@@ -40,7 +40,7 @@ const BarChart : FunctionComponent<LocalProperties> = ({selector, title}) => {
         sum += v.doc_count;
     }
 
-    if (sum == 0)
+    if (sum === 0)
         return <EmptyData />
 
     /*
