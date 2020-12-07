@@ -1,6 +1,9 @@
-import React, { FunctionComponent} from 'react';
+import React, { FunctionComponent } from 'react';
 import { RadialChart } from 'react-vis';
 import { useSelector } from '../store';
+import { areafilterChanged } from '../store/actions';
+import { useDispatch } from 'react-redux';
+import EmptyData from './EmptyData';
 import FullWidthLoading from './FullWidthLoading';
 
 interface LocalProperties {
@@ -11,20 +14,34 @@ interface LocalProperties {
 const BarChart : FunctionComponent<LocalProperties> = ({selector, title}) => {
 
     const data = useSelector((s) => s[selector])
+    const dispatch = useDispatch();
 
-    if (data === undefined)
-        return <FullWidthLoading />
-
-        console.log('area data', data);
-
-    const parsedData = [];
-    for (let [k,v] of Object.entries<any>(data))
-        parsedData.push({
-            label: k,
-            angle: v.doc_count
-        })
+    const setAreaFilter = (a? : string) => {
+        dispatch(areafilterChanged(a))
+    }
 
     
+
+    if (data === undefined)
+        return <FullWidthLoading />        
+
+    const parsedData = [];
+    let sum = 0;
+    for (let [k,v] of Object.entries<any>(data))
+    {
+        if (v.doc_count === 0)
+            continue; 
+
+        parsedData.push({
+            label: k,
+            subLabel: v.doc_count,
+            angle: v.doc_count
+        })
+        sum += v.doc_count;
+    }
+
+    if (sum == 0)
+        return <EmptyData />
 
     /*
     */
@@ -33,16 +50,21 @@ const BarChart : FunctionComponent<LocalProperties> = ({selector, title}) => {
             <h2>{title}</h2>
             <div className="chartDetail">
                 <RadialChart
+                    className='pieChart'
                     data={parsedData}
                     width={350}
                     height={300}
                     showLabels={true}
-                    subLabel={}
                     labelsRadiusMultiplier={.8}
+                    innerRadius={150}
+                    onValueClick={(v) => setAreaFilter(v.label)}
                     labelsStyle={{
                         stroke: 'white',
-                        fontSize: '12px'
-                    }} />
+                        fontSize: '12px',
+                        textAlign: 'center'
+                    }}>
+
+                    </RadialChart>
             </div>
         </div>
     )

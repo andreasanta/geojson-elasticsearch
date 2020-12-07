@@ -37,3 +37,8 @@ export interface VRampBoundsChangedAction
     extends VRampBaseAction {
     bounds: LatLngBounds
 }
+
+export interface VFilterChangedAction
+    extends VRampBaseAction {
+    value?: string
+}

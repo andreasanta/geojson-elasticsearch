@@ -1,4 +1,5 @@
 import { LatLngBounds } from 'leaflet';
+import { filter } from 'lodash';
 import store from '../store';
 import { geodataLoaded, materialdataLoaded, areadataLoaded } from '../store/actions';
 import { VRampState } from '../store/types';
@@ -12,14 +13,72 @@ var client = new elasticsearch.Client({
     apiVersion: '7.x'
 });
 
-export const loadAllRamps = async () => {
+const buildQueryFromState = (state? : VRampState) : any => {
+    // Filter by material or size if specified
+    let builtQuery = {
+        match_all: {}
+    };
+
+    if (state && (state.filterMaterial || state.filterSize))
+    {
+        let newQuery : any = {
+            bool: {}
+        }
+
+        if (state.filterMaterial)
+        {
+            newQuery.bool.must = {};
+            newQuery.bool.must.match = {
+                material: state.filterMaterial
+            }
+        }
+
+        if (state.filterSize)
+        {
+            newQuery.bool.filter = {
+                range: {
+
+                }
+            };
+
+            switch (state.filterSize)
+            {
+                case '[0, 50)':
+                    newQuery.bool.filter.range.area_ = {
+                        gte: 0,
+                        lt: 50
+                    }
+                break;
+
+                case '[50, 200)':
+                    newQuery.bool.filter.range.area_ = {
+                        gte: 50,
+                        lt: 200
+                    }
+                break;
+
+                case '[200, 526)':
+                    newQuery.bool.filter.range.area_ = {
+                        gte: 200,
+                        lt: 526
+                    }
+                break;
+            }
+        }
+
+        builtQuery = newQuery;
+    }
+
+    return builtQuery;
+}
+
+export const loadAllRamps = async (state? : VRampState) => {
+
 
     const geoData = await client.search({
         index: INDEX_NAME,
         body: {
-            query: {
-                match_all: {}
-            }
+            query: buildQueryFromState(state)
         },
         size: 250
     });
@@ -31,6 +90,31 @@ export const loadAllRamps = async () => {
 export const loadMaterials = async (state? : VRampState) => {
     
     const bounds : LatLngBounds | undefined = state?.bounds || store.getState().bounds;
+    let must : any = {
+        match_all: {}
+    }
+
+    let filters : any = {
+        geo_shape: {
+            geometry: {                                
+                shape: {
+                    type: 'envelope',
+                    coordinates: [ [bounds?.getWest(), bounds?.getNorth()], [bounds?.getEast(), bounds?.getSouth()]]
+                }
+            }
+        }
+    }
+
+    const filterQuery = buildQueryFromState(state);
+    if (filterQuery.bool?.must?.match?.material)
+        must = {
+            match: {
+                material: filterQuery.bool?.must?.match?.material
+            }
+        }
+    
+    if (filterQuery.bool?.filter?.range?.area_)
+        filters = [filters, {range: filterQuery.bool?.filter?.range}];
 
     const geoData = await client.search({
         index: INDEX_NAME,
@@ -38,18 +122,9 @@ export const loadMaterials = async (state? : VRampState) => {
             query: {
                 bool: {
                     must: {
-                        match_all: {}
+                        ...must
                     },
-                    filter: {
-                        geo_shape: {
-                            geometry: {                                
-                                shape: {
-                                    type: 'envelope',
-                                    coordinates: [ [bounds?.getWest(), bounds?.getNorth()], [bounds?.getEast(), bounds?.getSouth()]]
-                                }
-                            }
-                        }
-                    },
+                    filter: filters
                 }
             },
             aggs: {
@@ -72,24 +147,41 @@ export const loadSizes = async (state? : VRampState) => {
 
     const bounds : LatLngBounds | undefined = state?.bounds || store.getState().bounds;
 
+    let must : any = {
+        match_all: {}
+    }
+
+    let filters : any = {
+        geo_shape: {
+            geometry: {                                
+                shape: {
+                    type: 'envelope',
+                    coordinates: [ [bounds?.getWest(), bounds?.getNorth()], [bounds?.getEast(), bounds?.getSouth()]]
+                }
+            }
+        }
+    }
+
+    const filterQuery = buildQueryFromState(state);
+    if (filterQuery.bool?.must?.match?.material)
+        must = {
+            match: {
+                material: filterQuery.bool?.must?.match?.material
+            }
+        }
+    
+    if (filterQuery.bool?.filter?.range?.area_)
+        filters = [filters, {range: filterQuery.bool?.filter?.range}];
+
     const geoData = await client.search({
         index: INDEX_NAME,
         body: {
             query: {
                 bool: {
                     must: {
-                        match_all: {}
+                        ...must
                     },
-                    filter: {
-                        geo_shape: {
-                            geometry: {                                
-                                shape: {
-                                    type: 'envelope',
-                                    coordinates: [ [bounds?.getWest(), bounds?.getNorth()], [bounds?.getEast(), bounds?.getSouth()]]
-                                }
-                            }
-                        }
-                    },
+                    filter: filters
                 }
             },
             aggs: {

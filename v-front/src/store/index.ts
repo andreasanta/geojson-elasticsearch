@@ -1,11 +1,17 @@
 import { createStore, applyMiddleware } from "redux";
 import { createSelectorHook } from 'react-redux'
 import thunkMiddleware from 'redux-thunk';
-import {VRampState, VRampBaseAction, VRampGeoDataAction, VRampBoundsChangedAction, VRampMapLoadedAction} from './types';
+import {
+    VRampState,
+    VRampBaseAction,
+    VRampGeoDataAction,
+    VRampBoundsChangedAction,
+    VRampMapLoadedAction,
+    VFilterChangedAction
+} from './types';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { ACTION_TYPES } from './actions/types';
-import { loadAll } from './reactions';
-import { loadMaterials, loadSizes } from '../apis';
+import { loadAllRamps, loadMaterials, loadSizes } from '../apis';
 
 
 const initialState : VRampState = {
@@ -51,6 +57,34 @@ function baseReducer(state : VRampState = initialState, action : VRampBaseAction
         case ACTION_TYPES.AREA_LOADED:
             const ca3 = action as VRampGeoDataAction;
             return {...state, areas: ca3.payload}
+
+        case ACTION_TYPES.MATERIAL_CHANGED:
+            const ca4 = action as VFilterChangedAction;
+
+            // Deselect previous value
+            if (state.filterMaterial == ca4.value)
+                ca4.value = undefined;
+
+            const newState2 = {...state, filterMaterial: ca4.value};
+            loadAllRamps(newState2);
+            loadSizes(newState2);
+            loadMaterials(newState2);
+
+            return newState2;
+
+        case ACTION_TYPES.AREA_CHANGED:
+            const ca5 = action as VFilterChangedAction;
+
+            // Deselect previous value
+            if (state.filterSize == ca5.value)
+                ca5.value = undefined;
+
+            const newState3 = {...state, filterSize: ca5.value};
+            loadAllRamps(newState3);
+            loadSizes(newState3);
+            loadMaterials(newState3);
+
+            return newState3;
     }
 
     return state;
